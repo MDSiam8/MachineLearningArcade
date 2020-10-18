@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html;" charset="UTF-8" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <script src="../tfjs/tfjs-core.js"></script>
+        <script src="../tfjs/tfjs-converter.js"></script>
+        <script src="../tfjs/facemesh.js"></script>
+        <script src="../tfjs/tfjs-backend-webgl.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Snake</title>
+        <script src="../js/phaser.min.js"></script>
+
+        <link rel="stylesheet" href="../css/page.css" />
+
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;500;700;900&display=swap" rel="stylesheet" />
+    </head>
+    <body>
+         <div class="header">
+            <h1>Snake</h1>
+            <div id="home">
+                <img onclick="location.href='home.html';" src="../img/home-outline.png" alt="press to go to home page" />
+            </div>
+        </div>
+        <div class="container">
+            <div id="game" style="width: 520px; height: 400px;">
+        <script>
+            var game = new Phaser.Game(520, 400, Phaser.AUTO, "game", { preload: preload, create: create, update: update });
+            const start = "Look any direction to Start";
+            const over = "Game Over";
+            var playing = false;
+            var snake;
+            var food;
+            var bodySize;
+            var score;
+            var updateDelay;
+            var direction = 5;
+            var new_direction;
+            var addNew;
+            var cursors;
+            var scoreText;
+            var textStyle_Key;
+            var textStyle_value;
+            var gameOver = false;
+            function preload() {
+                game.load.image("snake", "../MLSnake/body.png");
+                game.load.image("food", "../MLSnake/food.png");
+                game.load.bitmapFont("font", "../img/font.png", "../img/font.xml");
+                game.load.image("againButton", "../img/playAgain.png");
+            }
+            function create() {
+                start_text = game.add.bitmapText(game.world.centerX, game.world.centerY / 3, "font", start, 24);
+                start_text.anchor.setTo(0.5, 0.5);
+                gameOverText = game.add.bitmapText(game.world.centerX, game.world.centerY / 3, "font", over, 24);
+                gameOverText.anchor.setTo(0.5, 0.5);
+                snake = [];
+                food = {};
+                bodySize = 20;
+                score = 0;
+                scoreText = game.add.bitmapText(game.world.centerX, game.world.centerY / 3, "font", score, 24);
+                updateDelay = 0;
+                direction = 0;
+                new_direction = null;
+                addNew = false;
+                cursors = game.input.keyboard.createCursorKeys();
+                game.stage.backgroundColor = "black";
+                createSnake();
+                generateFood();
+                start_text.visible = true;
+                gameOverText.visible = false;
+                againButton = game.add.button(game.world.centerX, game.world.centerY, "againButton", startGame, this);
+                againButton.anchor.set(0.5, 0.5);
+                againButton.visible = false;
+            }
+            function update() {
+                if (gameOver === true) {
+                    againButton.visible = true;
+                    gameOverText.visible = true;
+                    game.world.bringToTop(gameOverText);
+                    playing = false;
+                    snake.visible = false;
+                    food.visibile = false;
+                    updateDelay = 0.1;
+                    game.world.bringToTop(againButton);
+                }
+                if (direction === 0 && gameOver === false) {
+                    playing = false;
+                }
+                if (playing === false) {
+                    scoreText.visible = false;
+                }
+                if (!(direction === 0) && gameOver === false) {
+                    playing = true;
+                    scoreText.visible = true;
+                }
+                if (playing === true && gameOver === false) {
+                    start_text.visible = false;
+                }
+                if (cursors.right.isDown && direction != "left") {
+                    new_direction = "right";
+                } else if (cursors.left.isDown && direction != "right") {
+                    new_direction = "left";
+                } else if (cursors.up.isDown && direction != "down") {
+                    new_direction = "up";
+                } else if (cursors.down.isDown && direction != "up") {
+                    new_direction = "down";
+                }
+                updateDelay++;
+                if (updateDelay % 9 == 0) {
+                    var firstCell = snake[snake.length - 1],
+                        lastCell = snake.shift(),
+                        oldLastCellx = lastCell.x,
+                        oldLastCelly = lastCell.y;
+                    if (new_direction) {
+                        direction = new_direction;
+                        new_direction = null;
+                    }
+                    if (direction == "right") {
+                        lastCell.x = firstCell.x + bodySize;
+                        lastCell.y = firstCell.y;
+                    } else if (direction == "left") {
+                        lastCell.x = firstCell.x - bodySize;
+                        lastCell.y = firstCell.y;
+                    } else if (direction == "up") {
+                        lastCell.x = firstCell.x;
+                        lastCell.y = firstCell.y - bodySize;
+                    } else if (direction == "down") {
+                        lastCell.x = firstCell.x;
+                        lastCell.y = firstCell.y + bodySize;
+                    }
+                    snake.push(lastCell);
+                    firstCell = lastCell;
+                    if (addNew) {
+                        snake.unshift(game.add.sprite(oldLastCellx, oldLastCelly, "snake"));
+                        addNew = false;
+                    }
+                    eat();
+                    eatSelf(firstCell);
+                    wallCrash(firstCell);
+                    function eat() {
+                        for (var i = 0; i < snake.length; i++) {
+                            if (snake[i].x == food.x && snake[i].y == food.y) {
+                                addNew = true;
+                                food.destroy();
+                                generateFood();
+                                score++;
+                            }
+                        }
+                    }
+                    function eatSelf(head) {
+                        for (var i = 0; i < snake.length - 1; i++) {
+                            if (head.x == snake[i].x && head.y == snake[i].y) {
+                                playing = false;
+                                gameOver = true;
+                                direction = 0;
+                            }
+                        }
+                    }
+                    function wallCrash(head) {
+                        if (head.x >= game.world.width || head.x < 0 || head.y >= game.world.height || head.y < 0) {
+                            playing = false;
+                            direction = 0;
+                            gameOver = true;
+                        }
+                    }
+                }
+                updateScore();
+            }
+            function createSnake() {
+                for (var i = 0; i < 1; i++) {
+                    snake[i] = game.add.sprite(game.world.centerX, game.world.centerY, "snake");
+                }
+            }
+            function generateFood() {
+                var randomX = Math.floor(Math.random() * 26) * bodySize;
+                var randomY = Math.floor(Math.random() * 20) * bodySize;
+                food = game.add.sprite(randomX, randomY, "food");
+            }
+            function updateScore() {
+                scoreText.text = score;
+                game.world.bringToTop(scoreText);
+                scoreText.anchor.setTo(0.5, 0.5);
+            }
+            function startGame() {
+                againButton.destroy();
+                this.game.state.restart();
+                playing = false;
+                gameOver = false;
+                updateDelay = 0;
+            }
+        </script>
+                 </div>
+                <script>
+                    async function get_facemesh() {
+                        const stream = document.getElementById("movie");
+        
+                        const model = await facemesh.load((maxFaces = 1));
+        
+                        while (1) {
+                            const faces = await model.estimateFaces(stream);
+        
+                            if (faces.length > 0) {
+                                var mesh = faces[0].scaledMesh;
+                                var widthAcross = mesh[454][0] - mesh[234][0];
+                                var heightVertical = mesh[152][1] - mesh[10][1];
+
+                                if (mesh[19][0] - mesh[64][0] <= widthAcross / 10 && direction != "left") {
+                                    document.getElementById("directionHead").innerHTML = "Right";
+                                    new_direction = "right";
+                                } else if (mesh[164][1] - mesh[19][1] <= heightVertical / 38 && direction != "up") {
+                                    document.getElementById("directionHead").innerHTML = "Down";
+                                    new_direction = "down";
+                                } else if (mesh[19][1] - mesh[280][1] <= heightVertical / 12 && direction != "down") {
+                                    document.getElementById("directionHead").innerHTML = "Up";
+                                    new_direction = "up";
+                                } else if (mesh[294][0] - mesh[19][0] <= widthAcross / 9 && direction != "right") {
+                                    document.getElementById("directionHead").innerHTML = "Left";
+                                    new_direction = "left";
+                                } else {
+                                    document.getElementById("directionHead").innerHTML = "Center";
+                                }
+                            } else {
+                                document.getElementById("directionHead").innerHTML = "No faces have been detected";
+                            }
+        
+                        }
+                    }
+        
+                    </script>
+                <div class="webcam">
+                <video width="400" height="300" autoplay id="movie" style="position: fixed;"></video>
+                <div class="headpos">
+                    <p id="directionHead"></p>
+                </div>
+            </div>
+
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <h2>How to Play</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Playing this game is easy (or so it seems)! Turn your face left if you want the snake to go left, turn your face right if you want the snake to go right, turn you face up if you want the snake to go up, and finally, turn your face down if you want the snake to go down (phew, what a mouthful!). Pro tip: if the computer keeps detecting your face incorrectly, please try to adjust your camera angle; also, the game performance is best when played on a high performance device.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <h3>Have Fun!</h3>
+                    </div>
+                </div>
+            </div>
+            <script>
+                video = document.getElementById("movie");
+                if (navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+                        video.srcObject = stream;
+                    });
+                }
+
+                main();
+
+                function main() {
+                    if (video.readyState == 4) {
+                        document.getElementById("directionHead").innerHTML = "System is now loading... Please wait...";
+                        get_facemesh();
+                    } else {
+                        document.getElementById("directionHead").innerHTML = "Please enable webcam to play";
+                        setTimeout(main, 1000 / 30);
+                    }
+                }
+            </script>
+        </div>
+        <div class="buttonGroup">
+            <button class="btn" id="howBtn">How to Play</button>
+            <button onclick="location.href='pong.html';" class="btn" id="snakeBtn">Play MLPong</button>
+        </div>
+        <script>
+            var modal = document.getElementById("myModal");
+
+            var btn = document.getElementById("howBtn");
+
+            var span = document.getElementsByClassName("close")[0];
+
+            btn.onclick = function () {
+                modal.style.display = "block";
+            };
+
+            span.onclick = function () {
+                modal.style.display = "none";
+            };
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            };
+        </script>
+    </body>
+</html>

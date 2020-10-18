@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html;" charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>About</title>
+        <link rel="stylesheet" href="../css/extra.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;500;700;900&display=swap" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="header">
+            <h1>About</h1>
+            <div id="home">
+                <img onclick="location.href='home.html';" src="../img/home-outline.png" alt="press to go to home page" />
+            </div>
+        <div class="container">
+            <h2 style="color: black; text-align: left;">Why?</h2>
+            <p>Why did I create a whole website dedicated to games you play with parts of your body? It certainly doesn't change the world, does it? The reason why I created this is to show the world how cool code and—more importantly, as explained later on—Machine Learning can be, in a very unique and fun way. Is this app somehow going to change the world we live in today? Obviously not, but the implications of what's lying underneath it's hood surely will. This project uses something called machine learning. Typically, a computer cannot recognize your face or your hand, not to mention tracking it; that would be a whole other nightmare. But however, through machine learning, that is possible! Machine learning, simply put, is when you "feed" a computer lots of data, and the computer will try and find patterns out of it to teach itself, without needing to be clearly programmed. Some of these patterns that computers can recognize are so advanced that humans couldn't have recognized them by themselves. And since computers can do things much faster than humans and most of the times more accurately than humans, I'm sure it's clear to you how much of an impact this can potentially have on this entire world. The benefits are endless:</p>
+            <ul style="padding-left: 5%;">
+               <li>Medical breakthroughs, such as early detection for diseases such as cancer (such breakthroughs have already been made - some of them were found to be more accurate than diagnoses by doctors!).</li> 
+                <li>Financial uses, such as recognizing stock patterns and taking proper action to ensure gains.</li>
+                <li>Emotional support, i.e. being able to detect when someone is feeling down based on social media patterns and giving them the help they need.</li>
+                <li>Technological innovations, such as being able to detect brainwaves and correspondingly using said brainwaves to turn them into speech of any language, thereby breaking the language barrier.</li>
+                <li>Social and humanitarian objectives, such as immediately being able to detect areas impacted by disaster and sending help.</li>
+                <li>Scientific advances, such as finding planets previously thought to be non-existent.</li>
+            </ul>
+            <p>This list contained only a few of the many incredible things that can be done and facilitated at an unprecedented scale through machine learning. But I digress; <p id="purpose">the whole entire reason I created this project was so I can inspire the members of this generation to pursue machine learning, or at least implant a seed of curiosity in them so they can change the world in the future using this incredible technology.</p> How do I know demonstrating Machine Learning through unique ways such as games can inspire people? Because I was inspired to make this project in the same exact way. 
+            <h2>How was this project created?</h2>
+            <p>First and foremost, I created the HTML structure and the CSS that goes with it. Then I created the games, using a free, open-source game framework called <a href="https://phaser.io/" target="_blank">Phaser</a> (I used Version 2.6.2). Then, using models that were already trained through machine learning, I experimented with them using JavaScript and integrated them into the controls of my games. Here's how each of them works:
+            </p>
+            <ul>
+                <li><h3>Facemesh.js</h3>This is the model used in MLSnake. What this model does is that it tracks and stores the location (X, Y, and Z coordinates) of <a href="https://github.com/tensorflow/tfjs-models/blob/master/face-landmarks-detection/mesh_map.jpg" target="_blank">multiple points on your face</a>, approximately 486 to be exact, into a large array. By tracking points relative to point 19 i.e. the nose, taking their difference, and comparing it to the overall length and width of the face, I made it so that the computer can decide which way a person's face is facing, which was used in MLSnake. <a href="https://github.com/tensorflow/tfjs-models/tree/master/face-landmarks-detection" target="_blank">You can learn more about this by clicking here</a>.</li>
+            </ul>
+              <ul>
+                <li><h3>Handtrack.js</h3>This is the model used MLPong. This model is similar to Facemesh.js: basically, all it does is that it checks to see if there's a hand within view, and then tracks it if there is. Just like Facemesh.js, it stores the information into an array. By setting the y-axis movements of the MLPong paddle equal to the y-axis movements of the user's hand, I was able to make it so that your hand movements control the paddle. <a href="https://github.com/victordibia/handtrack.js/" target="_blank">You can learn more about this by clicking here</a>.</li>
+            </ul>
+            <p>If you would like to see the code for my project, you can <a href="https://github.com/MDSiam8/MachineLearningArcade" target="_blank">click here.</a></p>
+            <h2>More Information</h2>
+            <p>In this section of this page, I will go slightly more indepth about these Machine Learning models and give more insight into Phaser, the game framework I used.</p>
+            <ul><h3><li>TensorFlow</li></h3> This is the Machine Learning library that I used. In fact, this is the most popular one in the whole entire world. It's free, <a href="https://opensource.org/osd" target="_blank">open-sourced</a>, and available for (but not limited to) research, education, and commercial uses. Originally, this was used with Python. But now, with the immense growth of JavaScript, that's no more, as a lot of TensorFlow models have been ported to JavaScript, in what is known as TensorFlow.js. TensorFlow.js can be used to convert existing Python models, use pretrained models, retrain existing models with your own data, and develop models directly in JavaScript. <a href="https://github.com/tensorflow/tensorflow/blob/master/LICENSE" target="_blank">TensorFlow is licensed under the Apache 2.0 Open Source License, and to learn more, you can click here.</a></ul>
+            <ul><h3><li>Phaser</li></h3>This is the game framework I used to make my games. I used this as it greatly facilitates the process of game development. Like TensorFlow, this is also free, open-sourced, and available for a wide range of uses. <a href="https://phaser.io/download/license" target="_blank">Phaser is licensed under the MIT License, and to learn more, you can click here.</a></ul>
+            </div>
+
+           
+        </div>
+    </body>
+</html>

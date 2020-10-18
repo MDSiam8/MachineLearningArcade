@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html;" charset="UTF-8" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <script src="../tfjs/handtrack.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Pong</title>
+        <script src="../js/phaser.min.js"></script>
+        <link rel="stylesheet" href="../css/page.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;500;700;900&display=swap" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="header">
+            <h1>Pong</h1>
+            <div id="home">
+                <img onclick="location.href='home.html';" src="../img/home-outline.png" alt="press to go to home page" />
+            </div>
+        </div>
+        <div class="container">
+            <div id="game" style="width: 520px; height: 400px;">
+                <script>
+                    var game = new Phaser.Game(520, 400, Phaser.AUTO, "game", {
+                        preload: preload,
+                        create: create,
+                        update: update,
+                    });
+                    var paddle1;
+                    var paddle2;
+                    var speed = 5;
+                    var cursors;
+                    var ball;
+                    var ball_launched;
+                    var ball_velocity;
+                    var streak = 1;
+                    var difficulty = ball_velocity - 1.1 * streak;
+                    const Start = "Click or Tap to Start!";
+                    const Win = "You Win!";
+                    const Lose = "You Lose!";
+                    var score1;
+                    var score2;
+                    var win = false;
+                    var lose = false;
+                    var playing = false;
+                    var againButton;
+                    var mirror = 1;
+
+                    function preload() {
+                        game.load.image("paddle", "../MLPong/paddle.png");
+                        game.load.image("ball", "../MLPong/ballSmall.png");
+                        game.load.bitmapFont("font", "../img/font.png", "../img/font.xml");
+                        game.load.image("againButton", "../img/playAgain.png");
+                    }
+
+                    function create() {
+                        paddle1 = create_paddle(0, game.world.centerY);
+                        paddle2 = create_paddle(game.world.width - 4.5, game.world.centerY);
+                        cursors = game.input.keyboard.createCursorKeys();
+                        ball_launched = false;
+                        ball = create_ball(game.world.centerX, game.world.centerY);
+                        game.input.onDown.add(launch_ball, this);
+                        start_text = game.add.bitmapText(game.world.centerX, game.world.centerY / 3, "font", "0", 24);
+                        start_text.anchor.setTo(0.5, 0.5);
+                        score1_text = game.add.bitmapText(game.world.width / 4, game.world.height / 3, "font", "0", 64);
+                        score2_text = game.add.bitmapText(game.world.width - game.world.width / 3, game.world.height / 3, "font", "0", 64);
+                        Win_text = game.add.bitmapText(game.world.centerX, game.world.centerY / 3, "font", "0", 64);
+                        Win_text.anchor.setTo(0.5, 0.5);
+                        Lose_text = game.add.bitmapText(game.world.centerX, game.world.centerY / 3, "font", "0", 64);
+                        Lose_text.anchor.setTo(0.5, 0.5);
+                        score1 = 0;
+                        score2 = 0;
+                        againButton = game.add.button(game.world.centerX, game.world.centerY, "againButton", startGame, this);
+                        againButton.anchor.set(0.5, 0.5);
+                    }
+                    function update() {
+                        start_text.text = Start;
+                        score1_text.text = score1;
+                        score2_text.text = score2;
+                        Win_text.text = Win;
+                        Lose_text.text = Lose;
+                        ball_velocity = 450 + streak;
+                        againButton.visible = false;
+                        if (playing === false) {
+                            start_text.visible = true;
+                            score1_text.visible = false;
+                            score2_text.visible = false;
+                            streak = 0;
+                        }
+                        if (playing === true) {
+                            start_text.visible = false;
+                            score1_text.visible = true;
+                            score2_text.visible = true;
+                            streak += 0.025;
+                        }
+                        if (cursors.down.isDown) {
+                            paddle1.y += speed;
+                        }
+
+                        if (cursors.up.isDown) {
+                            paddle1.y -= speed;
+                        }
+
+                        game.physics.arcade.collide(paddle1, ball);
+                        game.physics.arcade.collide(paddle2, ball);
+
+                        if (ball.body.blocked.left) {
+                            score2 += 1;
+                            ball.x = game.world.centerX;
+                            ball.y = game.world.centerY;
+                            paddle1.y = game.world.centerY;
+                            paddle2.y = game.world.centerY;
+                            ball.body.velocity.setTo(0, 0);
+                            playing = false;
+                            game.input.onDown.add(launch_ball);
+                        } else if (ball.body.blocked.right) {
+                            score1 += 1;
+                            ball.x = game.world.centerX;
+                            ball.y = game.world.centerY;
+                            paddle1.y = game.world.centerY;
+                            paddle2.y = game.world.centerY;
+                            ball.body.velocity.setTo(0, 0);
+                            playing = false;
+                            game.input.onDown.add(launch_ball);
+                        }
+                        if (!(score1 == 15)) {
+                            Win_text.visible = false;
+                            Lose_text.visible = false;
+                        }
+                        if (score1 >= 15) {
+                            win = true;
+                            Win_text.visible = true;
+                        } else if (score2 >= 15) {
+                            lose = true;
+                            Lose_text.visible = true;
+                        }
+                        if (win === true || lose === true) {
+                            againButton.visible = true;
+                        }
+
+                        paddle2.body.velocity.setTo(ball.body.velocity.y);
+                        paddle2.body.velocity.x = 0;
+                        paddle2.body.maxVelocity.y = difficulty;
+                    }
+
+                    function create_paddle(x, y) {
+                        var paddle = game.add.sprite(x, y, "paddle");
+                        paddle.anchor.setTo(0.5, 0.5);
+                        game.physics.arcade.enable(paddle);
+                        paddle.body.collideWorldBounds = true;
+                        paddle.body.immovable = true;
+                        paddle.scale.setTo(0.85, 0.85);
+                        return paddle;
+                    }
+                    function create_ball(x, y) {
+                        var ball = game.add.sprite(x, y, "ball");
+                        ball.anchor.setTo(0.5, 0.5);
+                        game.physics.arcade.enable(ball);
+                        ball.body.collideWorldBounds = true;
+                        ball.body.bounce.setTo(1, 1);
+                        ball.scale.setTo(1.1, 1.1);
+                        return ball;
+                    }
+                    function launch_ball() {
+                        if (ball_launched) {
+                            ball.x = game.world.centerX;
+                            ball.y = game.world.centerY;
+                            ball.body.velocity.setTo(0, 0);
+                            ball_launched = false;
+                            playing = false;
+                        } else {
+                            ball.body.velocity.x = -ball_velocity * mirror;
+                            ball.body.velocity.y = ball_velocity;
+                            ball_launched = true;
+                            playing = true;
+                            mirror = mirror * -1;
+                        }
+                    }
+                    function startGame() {
+                        againButton.destroy();
+                        ball.x = game.world.centerX;
+                        this.game.state.restart();
+                        playing = false;
+                        win = false;
+                        lose = false;
+                    }
+                </script>
+            </div>
+            <script>
+                const modelParams = {
+                    flipHorizontal: true, 
+                    maxNumBoxes: 1, // maximum number of hands to detect
+                    iouThreshold: 0.5, // ioU threshold aka accuracy to models used to train it
+                    scoreThreshold: 0.55, // confidence threshold for predictions
+                };
+
+                async function get_handtrack() {
+                    const model = await handTrack.load(modelParams);
+                    const stream = document.getElementById("movie");
+                    while (1) {
+                        const predictions = await model.detect(stream);
+                        if (predictions.length > 0) {
+                            document.getElementById("direction").innerHTML = "Hand has been detected.";
+
+                            paddle1.y = 2.5 * predictions[0]["bbox"][1]; //multiplied by 2.5 to offset it, as it cannnot on its own control the full scope of the paddle in the game
+                        } else {
+                            document.getElementById("direction").innerHTML = "System could not detect hand.";
+                        }
+                    }
+                }
+            </script>
+            <div class="webcam">
+                <video width="400" height="300" autoplay id="movie" style="position: fixed;"></video>
+                <div class="headpos">
+                    <p id="direction"></p>
+                </div>
+            </div>
+
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <h2>How to Play</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Playing this game is relatively simple: you just use your hands to control the paddle. Move your hand up, and the paddle will follow, and move your hand down, and the paddle shall obey. On the superficial level, this game may seem simple, but as soon as you start playing it, you'll realize it is a lot harder than it looks. Whichever side gets 15 points first wins. Good luck! Oh, and just in case you were wondering, no, this isn't magic. It's the power of machine learning! Pro tip: if the computer can't detect your hand or detects it incorrectly, please move to a setting with a simpler background and good lighting; also, the game performance is best when played on a high performance device.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <h3>Have Fun!</h3>
+                    </div>
+                </div>
+            </div>
+            <script>
+                video = document.getElementById("movie");
+                if (navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+                        video.srcObject = stream;
+                    });
+                }
+                main();
+                function main() {
+                    if (video.readyState == 4) {
+                        get_handtrack();
+                        document.getElementById("direction").innerHTML = "System is now processing... Please wait...";
+                    } else {
+                        setTimeout(main, 1000/30);
+                        document.getElementById("direction").innerHTML = "Please enable webcam to play.";
+                    }
+                }
+            </script>
+        </div>
+        <div class="buttonGroup">
+            <button class="btn" id="howBtn">How to Play</button>
+            <button onclick="location.href='snake.html';" class="btn" id="snakeBtn">Play MLSnake</button>
+        </div>
+        <script>
+            var modal = document.getElementById("myModal");
+
+            var btn = document.getElementById("howBtn");
+
+            var span = document.getElementsByClassName("close")[0];
+
+            btn.onclick = function () {
+                modal.style.display = "block";
+            };
+
+            span.onclick = function () {
+                modal.style.display = "none";
+            };
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            };
+        </script>
+    </body>
+</html>

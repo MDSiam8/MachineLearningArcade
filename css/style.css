@@ -1,0 +1,137 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+}
+.typewriter h1 {
+    border-right: solid 5px rgba(255, 255, 255, 0.75);
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 50px;
+    color: white;
+    animation: animated-text 4s linear 1s 1 normal both, animated-cursor 600ms linear infinite;
+    text-shadow: 3px 2px 2px red;
+}
+.typewriter {
+    padding-bottom: 30px;
+    padding-left: 10px;
+}
+@keyframes animated-text {
+    from {
+        width: 0;
+    }
+    to {
+        width: 1010px;
+    }
+}
+@keyframes animated-cursor {
+    from {
+        border-right-color: red;
+    }
+    to {
+        border-right-color: transparent;
+    }
+}
+html,
+body {
+    width: 100%;
+    height: 100%;
+    background-color: whitesmoke;
+}
+a {
+    padding-left: 5px;
+    padding-right: 7px;
+    color: white;
+    vertical-align: bottom;
+    text-decoration: none;
+    transition: 0.4s;
+}
+a:hover {
+    color: red;
+}
+.header {
+    height: 50px;
+    width: 100%;
+    background-color: black;
+    position: relative;
+}
+#linkers {
+    position: absolute;
+    bottom: 30%;
+    right: 0;
+}
+#logo {
+    height: 30px;
+    width: auto;
+    bottom: 30%;
+}
+.siteLand {
+    background-color: black;
+    width: 100%;
+    min-height: 30%;
+    display: block;
+    box-shadow: 2px 2px gray;
+}
+
+.gameContainer {
+    background-color: whitesmoke;
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-top: 3%;
+    height: 50%;
+}
+.gameCards {
+    background-color: black;
+    height: 100%;
+    width: 48%;
+    padding: 5px;
+    border: solid 3px red;
+    box-sizing: border-box;
+    float: left;
+    user-select: none;
+}
+#game1,
+#game2 {
+    margin-right: 2%;
+}
+.gameCards h1,
+p {
+    color: white;
+}
+.gameCards:hover {
+    background: red;
+    transition: all 0.25s linear;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade {
+    opacity: 0;
+    animation: fadeIn 4s forwards;
+}
+#message {
+    animation-delay: 6.5s;
+    padding-left: 10px;
+    text-align: center;
+}
+.gameCards {
+    opacity: 0;
+    animation: fadeIn 4s forwards;
+}
+#game1 {
+    animation-delay: 9s;
+}
+#game2 {
+    animation-delay: 11s;
+}
+::selection {
+    background: red;
+    color: white;
+    text-shadow: 3px 3px black;
+}
