@@ -43,7 +43,8 @@
                     var lose = false;
                     var playing = false;
                     var againButton;
-                    var mirror = 1;
+                    var mirror_x = 1;
+                    var mirror_y = 1;
 
                     function preload() {
                         game.load.image("paddle", "../MLPong/paddle.png");
@@ -168,11 +169,13 @@
                             ball_launched = false;
                             playing = false;
                         } else {
-                            ball.body.velocity.x = -ball_velocity * mirror;
-                            ball.body.velocity.y = ball_velocity;
+                            rand_array = [-1, 1];
+                            ball.body.velocity.x = -ball_velocity * mirror_x * (.5 + game.rnd.frac())/(1+game.rnd.frac());
+                            ball.body.velocity.y = ball_velocity * mirror_y;
                             ball_launched = true;
                             playing = true;
-                            mirror = mirror * -1;
+                            mirror_x = mirror_x * rand_array[game.rnd.between(0,1)];
+                            mirror_y = mirror_y * rand_array[game.rnd.between(0,1)];
                         }
                     }
                     function startGame() {
