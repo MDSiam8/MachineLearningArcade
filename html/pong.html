@@ -136,6 +136,12 @@
                         }
                         if (win === true || lose === true) {
                             againButton.visible = true;
+                            paddle1.visible = false;
+                            paddle2.visible = false;
+                            ball.visible = false;
+                            start_text.visible = false;
+                            score1_text.visible = false;
+                            score2_text.visible = false;
                         }
 
                         paddle2.body.velocity.setTo(ball.body.velocity.y);
