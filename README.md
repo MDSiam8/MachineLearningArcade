@@ -1,2 +1,3 @@
 # MachineLearningArcade
-This is my submission for the Congressional App Challenge. The name of this project is Machine Learning Arcade, and you can access it in the following link: https://mdsiam8.github.io/MachineLearningArcade/.
+This is my submission for the Congressional App Challenge, called Machine Learning Arcade. To view it, you can click on the link below:
+https://mdsiam8.github.io/MachineLearningArcade/
